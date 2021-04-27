@@ -35,9 +35,9 @@ ${thirdPartyLibraryFilePaths} = @(
     # SDL
     , 'SDL2.dll'
 
-    # OpenSSL x86
-    , 'libssl-1_1.dll'
-    , 'libcrypto-1_1.dll'
+    # OpenSSL x64
+    , 'libssl-1_1-x64.dll'
+    , 'libcrypto-1_1-x64.dll'
 ) | ForEach-Object { Join-Path -Path ${LIB_DIR_PATH} -ChildPath $_ }
 
 

@@ -6,7 +6,7 @@ The script(s) in this repository are used to deploy and package BesLyric-for-X o
 
 ## Environment
 
-Windows 10 x86
+Windows 10 x64
 
 ## Dependent tools
 
