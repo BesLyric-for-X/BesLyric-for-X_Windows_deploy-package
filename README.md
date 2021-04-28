@@ -14,6 +14,8 @@ These tools are required to complete the work:
 
 - PowerShell 5 / 7
 - windeployqt
+- CQtDeployer 1.4.7.0 (for MinGW only)
+- qmake (used by CQtDeployer)
 - Inno Setup 6.0.5 (u)
 - Enigma Virtual Box v9.60 Build 20210209
 
@@ -51,6 +53,11 @@ ${windeployqtPath} = '<path to windeployqt.exe>'
 ${mingwBinDirPath} = '<path to the directory contains g++.exe>'
 ${libDirPath}      = '<path to "%B4X_DEP_PATH%\lib", contains all 3rd party dll files>'
 
+# For cqtdeployer
+${cqtdeployerPath} = '<path to cqtdeployer.exe or cqtdeployer.bat>'
+${qmakePath}       = '<path to qmake.exe>'
+${libDirPath}      = '<path to "%B4X_DEP_PATH%\lib", contains all 3rd party dll files>'
+
 # For Inno Setup
 ${isccPath}             = "<path to Inno Setup's ISCC.exe>"
 ${issCompression}       = '<https://jrsoftware.org/ishelp/topic_setup_compression.htm>'
@@ -80,6 +87,22 @@ $windeployqtParams = @{
 }
 
 & '.\deploy\call_windeployqt.ps1' @windeployqtParams
+```
+
+##### CQtDeployer
+
+```powershell
+$cqtParams = @{
+    CQTDEPLOYER_PATH = ${cqtdeployerPath}
+    QMAKE_PATH       = ${qmakePath}
+    LIB_DIR_PATH     = ${libDirPath}
+    TARGET           = ${target}
+    INSTALL_ROOT     = ${installRoot}
+
+    DEPLOY_DIR_PATH  = ${deployDirPath}
+}
+
+& '.\deploy\call_cqtdeployer.ps1' @cqtParams
 ```
 
 #### Packaging scripts
@@ -183,6 +206,7 @@ ${tempFile} = `
 
 Projects:
 
+- [QuasarApp/CQtDeployer](https://github.com/QuasarApp/CQtDeployer)
 - [Inno Setup - jrsoftware](https://jrsoftware.org/isinfo.php)
 - [idleberg.innosetup - Inno Setup - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=idleberg.innosetup)
 - [alefragnani.pascal - Pascal - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=alefragnani.pascal)
