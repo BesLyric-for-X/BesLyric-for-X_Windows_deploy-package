@@ -117,6 +117,8 @@ MinVersion=6.1.7600
 ;   ArchitecturesAllowed=
 ;   ArchitecturesInstallIn64BitMode=
 
+; Before any other language is fully supported, disable language selection
+ShowLanguageDialog=no
 
 [Languages]
 Name: "zh_CN"; MessagesFile: ".\zh_CN\ChineseSimplified.isl"
