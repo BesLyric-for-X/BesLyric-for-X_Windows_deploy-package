@@ -70,7 +70,7 @@ ${evbBoxFilePath}       = '<path to generated Enigma Virtual Box boxed exe>'
 
 ```powershell
 $windeployqtParams = @{
-    WINDEPLOYQT_PATH   = ${windeployqt}
+    WINDEPLOYQT_PATH   = ${windeployqtPath}
     MINGW_BIN_DIR_PATH = ${mingwBinDirPath}
     LIB_DIR_PATH       = ${libDirPath}
     TARGET             = ${target}
