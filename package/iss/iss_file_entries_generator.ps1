@@ -21,10 +21,8 @@ ${filePathArray} = `
 
 ${numberOfDigits} = [System.Math]::Log10(${filePathArray}.Length) + 1
 
-Push-Location -Path ${SOURCE_DIR_PATH}
-
 foreach (${filePath} in ${filePathArray}) {
-    ${relativeFilePath} = Resolve-Path -Path ${filePath} -Relative
+    ${relativeFilePath} = [System.IO.Path]::GetRelativePath(${SOURCE_DIR_PATH}, ${filePath})
     ${relativeDirPath} = Split-Path -Path ${relativeFilePath} -Parent
 
     ${entrySource} = "{#MY_SOURCE_DIR_PATH}\${relativeFilePath}"
@@ -45,8 +43,6 @@ foreach (${filePath} in ${filePathArray}) {
         )
     )
 }
-
-Pop-Location
 
 ${fileEntries} | Out-File `
     -FilePath ${FILES_SECTION_FILE_PATH} `

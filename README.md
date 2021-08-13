@@ -190,6 +190,17 @@ ${absolutePath} = `
 
 Doc: [Combine(String, String) § Path.Combine Method (System.IO) | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/api/system.io.path.combine#System_IO_Path_Combine_System_String_System_String_)
 
+### Get the relative or absolute path to a file that may not exist
+
+Source: [answer 64540612 § How to convert absolute path to relative path in PowerShell? - Stack Overflow](https://stackoverflow.com/questions/12396025/how-to-convert-absolute-path-to-relative-path-in-powershell/64540612#64540612)
+
+```powershell
+${resultPath] = `
+    [System.IO.Path]::GetRelativePath('baseDirPath', 'relativeOrAbsolutePath')
+```
+
+Doc: [Path.GetRelativePath(String, String) Method (System.IO) | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/api/system.io.path.getrelativepath)
+
 ## Credits
 
 Projects:
