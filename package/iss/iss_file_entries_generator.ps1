@@ -18,6 +18,8 @@ ${filePathArray} = `
     Get-ChildItem -Path ${SOURCE_DIR_PATH} -File -Recurse | `
     Select-Object -ExpandProperty 'FullName'
 
+${numberOfDigits} = [System.Math]::Log10(${filePathArray}.Length) + 1
+
 Push-Location -Path ${SOURCE_DIR_PATH}
 
 foreach (${filePath} in ${filePathArray}) {
@@ -31,7 +33,7 @@ foreach (${filePath} in ${filePathArray}) {
         'Source: "{0}"; DestDir: "{1}"; Flags: ignoreversion' `
         -f @(${entrySource}, ${entryDestDir})
 
-    Write-Output -InputObject "File[$(${fileEntries}.Add(${fileEntry}))] ${filePath}"
+    Write-Output -InputObject "File[$($([string]$(${fileEntries}.Add(${fileEntry}))).PadLeft(${numberOfDigits}, '0'))] ${filePath}"
 }
 
 Pop-Location
