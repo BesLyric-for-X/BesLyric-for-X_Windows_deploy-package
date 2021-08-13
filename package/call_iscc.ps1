@@ -9,6 +9,7 @@ param (
 )
 
 
+#Requires -Version 7
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 3.0
 

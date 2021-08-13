@@ -12,7 +12,7 @@ Windows 10 x86
 
 These tools are required to complete the work:
 
-- PowerShell 5 / 7
+- PowerShell 7
 - windeployqt
 - Inno Setup 6.0.5 (u)
 - Enigma Virtual Box v9.60 Build 20210209
