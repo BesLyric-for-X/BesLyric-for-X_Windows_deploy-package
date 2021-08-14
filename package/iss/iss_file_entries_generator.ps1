@@ -33,7 +33,16 @@ foreach (${filePath} in ${filePathArray}) {
         'Source: "{0}"; DestDir: "{1}"; Flags: ignoreversion' `
         -f @(${entrySource}, ${entryDestDir})
 
-    Write-Output -InputObject "File[$($([string]$(${fileEntries}.Add(${fileEntry}))).PadLeft(${numberOfDigits}, '0'))] ${filePath}"
+    Write-Output -InputObject $(
+        'File[{0}] {1}' -f @(
+            , $(
+                [string]$(
+                    ${fileEntries}.Add(${fileEntry})
+                )
+            ).PadLeft(${numberOfDigits}, '0')
+            , ${filePath}
+        )
+    )
 }
 
 Pop-Location
