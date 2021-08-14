@@ -179,6 +179,17 @@ ${tempFile} = `
     Rename-Item -NewName { $_ -replace @('\.tmp$', '.ext') } -PassThru
 ```
 
+### Get the absolute path to a file that may not exist
+
+Source: [answer 16964490 § How to normalize a path in PowerShell? - Stack Overflow](https://stackoverflow.com/questions/495618/how-to-normalize-a-path-in-powershell/16964490#16964490)
+
+```powershell
+${absolutePath} = `
+    [System.IO.Path]::Combine('baseDirPath', 'relativeOrAbsolutePath')
+```
+
+Doc: [Combine(String, String) § Path.Combine Method (System.IO) | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/api/system.io.path.combine#System_IO_Path_Combine_System_String_System_String_)
+
 ## Credits
 
 Projects:

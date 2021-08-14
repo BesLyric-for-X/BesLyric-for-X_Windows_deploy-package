@@ -20,8 +20,11 @@ ${scriptLocationDirPath} = `
     Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
 
+${deployDirPath} = `
+    Resolve-Path -Path ${DEPLOY_DIR_PATH}
+
 ${exeFilePath} = `
-    Join-Path -Path ${DEPLOY_DIR_PATH} -ChildPath "${TARGET}.exe"
+    Join-Path -Path ${deployDirPath} -ChildPath "${TARGET}.exe"
 
 ${issFileEntriesIncludedFilePath} = `
     [System.IO.Path]::GetTempFileName() | `
@@ -32,6 +35,8 @@ ${outputInstallerDirPath} = `
 ${outputInstallerFileBaseName} = `
     [System.IO.Path]::GetFileNameWithoutExtension(${ISS_INSTALLER_FILE_PATH})
 
+
+Write-Output -InputObject "deployDirPath = ${deployDirPath}"
 
 Write-Output -InputObject "exeFilePath = ${exeFilePath}"
 Get-Item -Path ${exeFilePath} | Format-List
@@ -45,7 +50,7 @@ Write-Output -InputObject "outputInstallerFileBaseName = ${outputInstallerFileBa
 # Generate the entries of Inno Setup's [Files] section.
 
 $issParameters = @{
-    'SOURCE_DIR_PATH'         = ${DEPLOY_DIR_PATH}
+    'SOURCE_DIR_PATH'         = ${deployDirPath}
     'FILES_SECTION_FILE_PATH' = ${issFileEntriesIncludedFilePath}
 }
 
@@ -59,7 +64,7 @@ $issParameters = @{
 & ${ISCC_PATH} @(
     , $('/O' + ${outputInstallerDirPath})
     , $('/F' + ${outputInstallerFileBaseName})
-    , $('/D' + "MY_SOURCE_DIR_PATH=${DEPLOY_DIR_PATH}")
+    , $('/D' + "MY_SOURCE_DIR_PATH=${deployDirPath}")
     , $('/D' + "MY_FILES_SECTION_FILE_PATH=${issFileEntriesIncludedFilePath}")
     , $('/D' + "MY_APP_NAME=${TARGET}")
     , $('/D' + "MY_COMPRESSION=${ISS_COMPRESSION}")
