@@ -800,51 +800,6 @@ begin
 end;
 
 
-function TryToRefuseAdministrators(): Boolean;
-begin
-    Result := True;
-    if (IsAdmin()) then begin
-        Log('Attempt to run as administrator.');
-
-        // Continue the installation in SUPPRESSMSGBOXES mode.
-        if (IDNO = SuppressibleMsgBox(
-                CustomMessage('cm_RunAsAdministrator'),
-                mbConfirmation,
-                MB_YESNO or MB_DEFBUTTON2 or MB_SETFOREGROUND,
-                IDYES)) then begin
-            Log('Don''t want to run as administrator, exit.');
-            Result := False;
-        end;
-    end;
-
-    // If UAC is turned off, the installer will run with administrator
-    //   privileges. "runas" can be used to avoid it, but it's not a
-    //   normal way to launch a program for users.
-    // The install mode will not be affected by the UAC configuration.
-    //
-    // When PrivilegesRequired=lowest:
-    //   If UAC is OFF:
-    //     User privileges: Administrative
-    //     Administrative install mode: No
-    //     Install mode root key: HKEY_CURRENT_USER
-    //
-    //   If UAC is OFF and "runas" the basic user:
-    //     User privileges: None
-    //     Administrative install mode: No
-    //     Install mode root key: HKEY_CURRENT_USER
-    //
-    //   If UAC is ON and run without administrator privileges:
-    //     User privileges: None
-    //     Administrative install mode: No
-    //     Install mode root key: HKEY_CURRENT_USER
-    //
-    //   If UAC is ON and run with administrator privileges:
-    //     User privileges: Administrative
-    //     Administrative install mode: No
-    //     Install mode root key: HKEY_CURRENT_USER
-end;
-
-
 procedure InitializeVariables();
 begin
     boolean_exit_with_confirmation := True;
@@ -856,7 +811,7 @@ begin
     Result := False;
 
     InitializeVariables();
-    Result := TryToRefuseAdministrators();
+    Result := True;
 end;
 
 
