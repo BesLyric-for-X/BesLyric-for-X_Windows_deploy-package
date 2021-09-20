@@ -282,12 +282,13 @@ begin
     Log(string_powershell_parameter);
 
     // https://www.powershelladmin.com/wiki/PowerShell_Executables_File_System_Locations
-    Exec(
+    if Exec(
         ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
         string_powershell_parameter,
-        '', SW_HIDE, ewWaitUntilTerminated, Result);
-
-    Log(Format('Code: %d (0x%x), %s', [Result, Result, SysErrorMessage(Result)]));
+        '', SW_HIDE, ewWaitUntilTerminated, Result) then
+        Log(Format('Exit code: %d', [Result]))
+    else
+        Log(Format('System error occurred. Code: %d (0x%x). Message: %s', [Result, Result, SysErrorMessage(Result)]));
 end;
 
 
@@ -302,12 +303,13 @@ begin
     string_cmd_parameter := '/F /IM "' + string_imageName_process + '"';
     Log(string_cmd_parameter);
 
-    Exec(
+    if Exec(
         ExpandConstant('{sys}\taskkill.exe'),
         string_cmd_parameter,
-        '', SW_HIDE, ewWaitUntilTerminated, Result);
-
-    Log(Format('Code: %d (0x%x), %s', [Result, Result, SysErrorMessage(Result)]));
+        '', SW_HIDE, ewWaitUntilTerminated, Result) then
+        Log(Format('Exit code: %d', [Result]))
+    else
+        Log(Format('System error occurred. Code: %d (0x%x). Message: %s', [Result, Result, SysErrorMessage(Result)]));
 end;
 
 
@@ -332,12 +334,13 @@ begin
 
     Log(STRING_UNINSTALLER_PARAMETER);
 
-    Exec(
+    if Exec(
         string_filePath_uninstaller,
         STRING_UNINSTALLER_PARAMETER,
-        '', SW_SHOWNORMAL, ewWaitUntilTerminated, Result);
-
-    Log(Format('Code: %d (0x%x), %s', [Result, Result, SysErrorMessage(Result)]));
+        '', SW_SHOWNORMAL, ewWaitUntilTerminated, Result) then
+        Log(Format('Exit code: %d', [Result]))
+    else
+        Log(Format('System error occurred. Code: %d (0x%x). Message: %s', [Result, Result, SysErrorMessage(Result)]));
 
     if (Result <> 0) then begin
         if (Result = 1) then begin
