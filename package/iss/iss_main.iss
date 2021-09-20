@@ -160,11 +160,11 @@ english.cm_ProgressWizardPage_StatusLabel_KillRunningInstance=Stopping running p
   zh_CN.cm_ProgressWizardPage_StatusLabel_LaunchUninstaller=正在卸载旧版本...
 english.cm_ProgressWizardPage_StatusLabel_LaunchUninstaller=Uninstalling old version...
 
-  zh_CN.cm_LaunchUninstaller_UninstallFailedToInitializeAndRecommendRetry=未能成功启动卸载程序，再试一次？
-english.cm_LaunchUninstaller_UninstallFailedToInitializeAndRecommendRetry=The uninstaller failed to start, try again?
+  zh_CN.cm_LaunchUninstaller_FailedToUninstall=卸载失败，退出代码：%1%n%n再试一次？
+english.cm_LaunchUninstaller_FailedToUninstall=Failed to uninstall, exit code: %1%n%nTry again?
 
-  zh_CN.cm_LaunchUninstaller_UninstallPreviousInstallation_Failed=无法启动卸载程序 %1%n错误代码：%2 （%3）
-english.cm_LaunchUninstaller_UninstallPreviousInstallation_Failed=Failed to start the uninstaller %1%nCode: %2 (%3)
+  zh_CN.cm_LaunchUninstaller_UnableToLaunchUninstaller=无法启动卸载程序。%n路径：%1%n错误代码 %2：%3%n%n再试一次？
+english.cm_LaunchUninstaller_UnableToLaunchUninstaller=Unable to launch the uninstaller.%nPath: %1%nError code %2. %3%n%nTry again?
 
   zh_CN.cm_ProgressWizardPage_StatusLabel_MigrateData=正在迁移数据文件...
 english.cm_ProgressWizardPage_StatusLabel_MigrateData=Migrating data...
@@ -178,8 +178,8 @@ english.cm_TryUninstallAndMigrateData_FoundOldInstallation=We detected you have 
   zh_CN.cm_TryUninstallAndMigrateData_UserRefusedToUninstallOldInstallation=用户没有卸载旧版本。
 english.cm_TryUninstallAndMigrateData_UserRefusedToUninstallOldInstallation=User did not uninstall the old version.
 
-  zh_CN.cm_TryUninstallAndMigrateData_UninstallFailedToInitializeAndGaveUp=无法启动卸载程序。
-english.cm_TryUninstallAndMigrateData_UninstallFailedToInitializeAndGaveUp=Failed to start the uninstaller.
+  zh_CN.cm_TryUninstallAndMigrateData_UnableToUninstallAndGaveUp=无法卸载旧版本。
+english.cm_TryUninstallAndMigrateData_UnableToUninstallAndGaveUp=Unable to uninstall the old version.
 
   zh_CN.cm_CurStepChanged_InstallerCannotContinue=安装程序不能继续。
 english.cm_CurStepChanged_InstallerCannotContinue=Setup cannot continue.

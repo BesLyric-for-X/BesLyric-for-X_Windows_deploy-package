@@ -334,22 +334,20 @@ begin
     if Exec(
         string_filePath_uninstaller,
         STRING_UNINSTALLER_PARAMETER,
-        '', SW_SHOWNORMAL, ewWaitUntilTerminated, Result) then
-        Log(Format('Exit code: %d', [Result]))
-    else
+        '', SW_SHOWNORMAL, ewWaitUntilTerminated, Result) then begin
+        Log(Format('Exit code: %d', [Result]));
+
+        if (Result <> 0) then
+            string_errorMessage := FmtMessage(CustomMessage('cm_LaunchUninstaller_FailedToUninstall'), [IntToStr(Result)]);
+    end else begin
         Log(Format('System error occurred. Code: %d (0x%x). Message: %s', [Result, Result, SysErrorMessage(Result)]));
 
-    if (Result <> 0) then begin
-        if (Result = 1) then begin
-            // Uninstaller failed to initilize.
-            string_errorMessage := CustomMessage('cm_LaunchUninstaller_UninstallFailedToInitializeAndRecommendRetry');
-        end else begin
-            // Other cases.
-            string_errorMessage := FmtMessage(CustomMessage('cm_LaunchUninstaller_UninstallPreviousInstallation_Failed'), [string_filePath_uninstaller, IntToStr(Result), SysErrorMessage(Result)]);
-        end;
-
-        Exit;
+        if (Result <> 0) then
+            string_errorMessage := FmtMessage(CustomMessage('cm_LaunchUninstaller_UnableToLaunchUninstaller'), [string_filePath_uninstaller, IntToStr(Result), SysErrorMessage(Result)]);
     end;
+
+    if (Result <> 0) then
+        Exit;
 
     // https://jrsoftware.org/ishelp/topic_uninstexitcodes.htm
     // > Note that at the moment you get an exit code back from the uninstaller, some code related to uninstallation might still be running.
@@ -521,31 +519,26 @@ begin
 
         WizardForm.ProgressGauge.Position := 60;
 
-        case (LaunchUninstaller(string_UninstallString, string_errorMessage)) of
-            0:
-                // Everything is OK.
-                break;
-            1: begin
-                // Uninstaller failed to initialize.
+        if (0 = LaunchUninstaller(string_UninstallString, string_errorMessage)) then begin
+            // Everything is OK.
+            break;
+        end else begin
+            // Something goes wrong.
 
-                WizardForm.ProgressGauge.State := npbsPaused;
+            WizardForm.ProgressGauge.State := npbsPaused;
 
-                // We will not retry the uninstallation in SUPPRESSMSGBOXES mode.
-                if (IDYES = SuppressibleMsgBox(string_errorMessage, mbError, MB_YESNO or MB_SETFOREGROUND, IDNO)) then begin
-                    // Try again. Continue the loop.
+            // We will not retry the uninstallation in SUPPRESSMSGBOXES mode.
+            if (IDYES = SuppressibleMsgBox(string_errorMessage, mbError, MB_YESNO or MB_SETFOREGROUND, IDNO)) then begin
+                // Try again. Continue the loop.
 
-                    WizardForm.ProgressGauge.State := npbsNormal;
+                WizardForm.ProgressGauge.State := npbsNormal;
 
-                    continue;
-                end else begin
-                    // Give up.
-                    string_errorMessage := CustomMessage('cm_TryUninstallAndMigrateData_UninstallFailedToInitializeAndGaveUp');
-                    Exit;
-                end;
+                continue;
+            end else begin
+                // Give up.
+                string_errorMessage := CustomMessage('cm_TryUninstallAndMigrateData_UnableToUninstallAndGaveUp');
+                Exit;
             end;
-        else
-            // Other cases (neither 0 nor 1).
-            Exit;
         end;
     end;
 
