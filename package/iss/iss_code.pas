@@ -59,6 +59,7 @@
 
 const
     INTEGER_MAXIMUM_PATH_LENGTH = 100; // characters
+    STRING_UNINSTALLER_PARAMETER = '/SILENT /NORESTART /SUPPRESSMSGBOXES /LOG';
 var
     boolean_exit_with_confirmation: Boolean; // Does bypass the prompt of exit installer.
 
@@ -325,18 +326,15 @@ function LaunchUninstaller(
         string_filePath_uninstaller: String;
     out
         string_errorMessage: String): Integer;
-var
-    string_uninstaller_parameter: String;
 begin
     Log(Format('::Entering %s(%s)', ['LaunchUninstaller', string_filePath_uninstaller]));
     WizardForm.StatusLabel.Caption := CustomMessage('cm_ProgressWizardPage_StatusLabel_LaunchUninstaller');
 
-    string_uninstaller_parameter := '/SILENT /NORESTART /SUPPRESSMSGBOXES /LOG';
-    Log(string_uninstaller_parameter);
+    Log(STRING_UNINSTALLER_PARAMETER);
 
     Exec(
         string_filePath_uninstaller,
-        string_uninstaller_parameter,
+        STRING_UNINSTALLER_PARAMETER,
         '', SW_SHOWNORMAL, ewWaitUntilTerminated, Result);
 
     Log(Format('Code: %d (0x%x), %s', [Result, Result, SysErrorMessage(Result)]));
