@@ -82,7 +82,7 @@ end;
 function StrToRegRootKey(
     const
         string_regRootKey: String;
-    var
+    out
         integer_regRootKey: Integer): Boolean;
 begin
     Result := True;
@@ -120,7 +120,7 @@ function TryGetValidRegistryInfos(
     const
         string_regRootKey,
         string_AppId: String;
-    var
+    out
         string_DisplayVersion,
         string_InstallLocation,
         string_UninstallString: String): Boolean;
@@ -323,7 +323,7 @@ end;
 function LaunchUninstaller(
     const
         string_filePath_uninstaller: String;
-    var
+    out
         string_errorMessage: String): Integer;
 var
     string_uninstaller_parameter: String;
@@ -477,7 +477,7 @@ function TryUninstallAndMigrateData(
         string_AppId: String;
     const
         boolean_doMigration: Boolean;
-    var
+    out
         string_errorMessage: String): Boolean;
 var
     string_DisplayVersion,
@@ -566,7 +566,7 @@ end;
 
 
 // No MsgBox.
-function ProcessOldInstallations(var string_errorMessage: String): Boolean;
+function ProcessOldInstallations(out string_errorMessage: String): Boolean;
 begin
     Result := False;
 
