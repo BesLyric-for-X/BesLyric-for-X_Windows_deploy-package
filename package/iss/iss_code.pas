@@ -53,9 +53,6 @@
 //   It seems that HKCU64 for the SOFTWARE Key is meaningless? Is HKCU enough?
 //   I think using HKCU32 and HKCU64 instead of HKCU is not a big problem.
 
-// For `Exec`, returnCode == 1 (ERROR_INVALID_FUNCTION), when I refused to run the uninstaller in UAC prompt.
-//   https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
-
 
 const
     INTEGER_MAXIMUM_PATH_LENGTH = 100; // characters
