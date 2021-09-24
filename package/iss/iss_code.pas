@@ -60,6 +60,9 @@ const
 var
     boolean_exit_with_confirmation: Boolean; // Does bypass the prompt of exit installer.
 
+    WbemLocator,
+    WbemServices: Variant;
+
 
 // Unable to use.
 function FmtCustomMessage(
@@ -320,16 +323,99 @@ begin
 end;
 
 
+// https://docs.microsoft.com/en-us/windows/win32/wmisdk/where-clause
+function EscapeBackslashAndSingleQuote(const S: String): String;
+begin
+    Result := S;
+    StringChangeEx(Result, '\', '\\', True);
+    StringChangeEx(Result, '''', '\''', True);
+end;
+
+
+// https://stackoverflow.com/questions/21390130/inno-setup-pascal-script-to-search-for-running-process/21408578#21408578
+function GetFilteredPIDByWMIQuery(
+    const
+        Filter: String;
+    const
+        ProcessCreatedDateNotEarlierThan (* yyyymmddhhnnss *): Int64;
+    out
+        PidList: array of String
+): Integer;
+var
+    WmiQueryString: string;
+
+    WbemObject,
+    WbemObjectSet: Variant;
+
+    I: Integer;
+begin
+    Log('ProcessCreatedDateNotEarlierThan: ' + IntToStr(ProcessCreatedDateNotEarlierThan));
+
+    SetArrayLength(PidList, 0);  // Initialize anyway
+
+    WmiQueryString := 'SELECT * FROM Win32_Process WHERE ' + Filter;
+
+    Log('WmiQueryString: ' + WmiQueryString);
+
+    WbemObjectSet := WbemServices.ExecQuery(WmiQueryString);
+
+    // ?
+    if not VarIsNull(WbemObjectSet) then begin
+        Log('WbemObjectSet.Count: ' + IntToStr(WbemObjectSet.Count));
+
+        for I := 0 to WbemObjectSet.Count - 1 do begin
+            WbemObject := WbemObjectSet.ItemIndex(I);
+
+            // ?
+            if not VarIsNull(WbemObject) then begin
+                Log(Format('ProcessId: %s, Name: "%s", CreationDate: %s, Commandline: %s', [
+                    WbemObject.ProcessId,
+                    WbemObject.Name,
+                    WbemObject.CreationDate,  // CIM_DATETIME: yyyymmddHHMMSS.mmmmmmsUUU
+                    WbemObject.Commandline    // Empty if lack of privilege
+                ]));
+
+                if ProcessCreatedDateNotEarlierThan <= StrToInt64(Copy(WbemObject.CreationDate, 1, 14)) then begin
+                    Log('Newly created process found');
+
+                    SetArrayLength(PidList, GetArrayLength(PidList) + 1);
+                    PidList[GetArrayLength(PidList) - 1] := WbemObject.ProcessId;
+                end;
+            end;
+        end;
+    end;
+
+    Result := GetArrayLength(PidList);
+end;
+
+
 function LaunchUninstaller(
     const
         string_filePath_uninstaller: String;
+    RemainingRetryTimes: Integer;
     out
         string_errorMessage: String): Integer;
+var
+    StartDateTime: Int64;
+
+    NamePattern,
+    NameFilter,
+    CommandlinePattern,
+    CommandlineFilter,
+    PidFilter: String;
+
+    FilteredPidList: array of String;
+
+    I: Integer;
 begin
     Log(Format('::Entering %s(%s)', ['LaunchUninstaller', string_filePath_uninstaller]));
     WizardForm.StatusLabel.Caption := CustomMessage('cm_ProgressWizardPage_StatusLabel_LaunchUninstaller');
 
     Log(STRING_UNINSTALLER_PARAMETER);
+
+    StartDateTime := StrToInt64(GetDateTimeString('yyyymmddhhnnss', #0, #0));
+
+    Log(Format('"%s" with "%s" will be executed no earlier than "%d"', [string_filePath_uninstaller, STRING_UNINSTALLER_PARAMETER, StartDateTime]));
 
     if Exec(
         string_filePath_uninstaller,
@@ -354,14 +440,52 @@ begin
     //
     // https://stackoverflow.com/questions/18902060/disk-caching-issue-with-inno-setup
     // Well, this has nothing to do with the disk cache, but the principle of Inno Setup uninstaller.
-    //   See this: https://stackoverflow.com/questions/18902060/disk-caching-issue-with-inno-setup/18972903#18972903
-    //
-    // If the uninstaller has been deleted, the uninstallation is over.
-    while (FileExists(string_filePath_uninstaller)) do begin
-        Log(Format('The uninstaller %s still exists, wait...', [string_filePath_uninstaller]));
-        Sleep(100);
-        // I don't think it's a good idea to set a timeout, because the performance of each computer is different.
+    Log('Waiting for the temporary uninstaller to end...');
+
+    // Name: _iu14D2N.tmp
+    NamePattern := '[_]iu[0-9A-V][0-9A-V][0-9A-V][0-9A-V][0-9A-V].tmp';
+    NameFilter := 'Name LIKE ''' + NamePattern + '''';
+
+    // Commandline: "GetTempDir()_iu14D2N.tmp" /SECONDPHASE="absolute\path\to\uninsNNN.exe" /FIRSTPHASEWND=$(hex)... arguments passed by user
+    CommandlinePattern := Format('"%s%s" /SECONDPHASE="%s" /FIRSTPHASEWND=$[0-9A-F]%% %s', [
+        EscapeBackslashAndSingleQuote(GetTempDir()),
+        NamePattern,
+        EscapeBackslashAndSingleQuote(string_filePath_uninstaller),
+        EscapeBackslashAndSingleQuote(STRING_UNINSTALLER_PARAMETER)  // uninstaller /LOG="path\to\ l o g' file"
+    ]);
+    CommandlineFilter := 'Commandline LIKE ''' + CommandlinePattern + '''';
+
+    // Initialize WMI connection.
+    WbemLocator := CreateOleObject('WbemScripting.SWbemLocator');
+    WbemServices := WbemLocator.ConnectServer();  // Connect to local computer and log on default namespace by default.
+
+    // Filter by Commandline (the most accurate way).
+    if 0 < GetFilteredPIDByWMIQuery(CommandlineFilter, StartDateTime, FilteredPidList) then
+        for I := Low(FilteredPidList) to High(FilteredPidList) do
+            Log('PID Filtered by Commandline: ' + FilteredPidList[I])
+    else
+        // Fallback. Filter by Image Name (not accurate, but works fine).
+        if 0 < GetFilteredPIDByWMIQuery(NameFilter, StartDateTime, FilteredPidList) then
+            for I := Low(FilteredPidList) to High(FilteredPidList) do
+                Log('PID Filtered by Name: ' + FilteredPidList[I]);
+
+    if 0 < GetArrayLength(FilteredPidList) then begin
+        PidFilter := '';
+        for I := Low(FilteredPidList) to High(FilteredPidList) do begin
+            PidFilter := PidFilter + 'ProcessId = ' + FilteredPidList[I];
+            if I <> High(FilteredPidList) then
+                PidFilter := PidFilter + ' OR ';
+        end;
+
+        // Filter by PID.
+        while (0 < GetFilteredPIDByWMIQuery(PidFilter, StartDateTime, FilteredPidList)) AND (0 < RemainingRetryTimes) do begin
+            Dec(RemainingRetryTimes);
+            Log('Waiting... ' + IntToStr(RemainingRetryTimes));
+            Sleep(250);
+        end;
     end;
+
+    Log('Uninstallation complete');
 end;
 
 
@@ -519,7 +643,7 @@ begin
 
         WizardForm.ProgressGauge.Position := 60;
 
-        if (0 = LaunchUninstaller(string_UninstallString, string_errorMessage)) then begin
+        if (0 = LaunchUninstaller(string_UninstallString, 20, string_errorMessage)) then begin
             // Everything is OK.
             break;
         end else begin
