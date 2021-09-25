@@ -485,6 +485,9 @@ begin
         end;
     end;
 
+    // Release the resource of WMI connection.
+    WbemServices := Null;
+
     Log('Uninstallation complete');
 end;
 
