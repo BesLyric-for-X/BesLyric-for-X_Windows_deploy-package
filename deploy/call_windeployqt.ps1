@@ -1,7 +1,6 @@
 ﻿
 param (
     [Parameter(Mandatory = $true)][string]${WINDEPLOYQT_PATH}
-    , [Parameter(Mandatory = $true)][string]${MINGW_BIN_DIR_PATH}
     , [Parameter(Mandatory = $true)][string]${LIB_DIR_PATH}
     , [Parameter(Mandatory = $true)][string]${TARGET}
     , [Parameter(Mandatory = $true)][string]${INSTALL_ROOT}
@@ -71,9 +70,6 @@ Copy-Item -Path ${innoSetupRequiredFilePaths} -Destination ${DEPLOY_DIR_PATH} -P
 Copy-Item -Path ${thirdPartyLibraryFilePaths} -Destination ${DEPLOY_DIR_PATH} -PassThru
 
 
-${oldEnvPath} = ${Env:\Path}
-${Env:\Path} += ";${MINGW_BIN_DIR_PATH}"
-
 & ${WINDEPLOYQT_PATH} @(
     , '--plugindir', "${DEPLOY_DIR_PATH}\plugins"
     , '--no-translations'
@@ -84,8 +80,6 @@ ${Env:\Path} += ";${MINGW_BIN_DIR_PATH}"
     , '--verbose', '2'
     , ${DEPLOY_DIR_PATH}
 )
-
-${Env:\Path} = ${oldEnvPath}
 
 if ($LASTEXITCODE -ne 0) {
     throw "${WINDEPLOYQT_PATH} exited with code $LASTEXITCODE."
