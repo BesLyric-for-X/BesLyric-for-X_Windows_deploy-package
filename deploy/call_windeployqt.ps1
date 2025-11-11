@@ -75,7 +75,6 @@ Copy-Item -Path ${thirdPartyLibraryFilePaths} -Destination ${DEPLOY_DIR_PATH} -P
     , '--no-translations'
     , '--no-system-d3d-compiler'
     , '--compiler-runtime'
-    , '--no-angle'
     , '--no-opengl-sw'
     , '--verbose', '2'
     , ${DEPLOY_DIR_PATH}
